@@ -1,6 +1,12 @@
 import { View, StyleSheet, KeyboardAvoidingView } from "react-native";
 import React, { useState } from "react";
-import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  HelperText,
+  Text,
+  TextInput,
+} from "react-native-paper";
 
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import {
@@ -21,7 +27,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       console.error(error);
-      alert("Falha ao fazer login " + error.message);
+      alert("Falha ao fazer login. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -34,7 +40,7 @@ const Login = () => {
       alert("Cadastro realizado com sucesso!");
     } catch (error: any) {
       console.error(error);
-      alert("Falha ao fazer cadastro " + error.message);
+      alert("Falha ao fazer cadastro. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -50,6 +56,7 @@ const Login = () => {
         <TextInput
           style={styles.input}
           mode="outlined"
+          activeOutlineColor="#000"
           value={email}
           label="Email"
           onChangeText={(text) => setEmail(text)}
@@ -57,28 +64,31 @@ const Login = () => {
         <TextInput
           style={styles.input}
           mode="outlined"
+          activeOutlineColor="#000"
           value={password}
           label="Senha"
           secureTextEntry
           onChangeText={(text) => setPassword(text)}
         />
 
+        <HelperText type="info">
+          A senha deve conter pelo menos 6 caracteres
+        </HelperText>
+
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#663399
-"
-          />
+          <ActivityIndicator size="large" color="#333" />
         ) : (
           <>
             <Button
               style={{ marginTop: 20, marginBottom: 20 }}
               mode="contained"
+              buttonColor="#000"
               children="Entrar"
               onPress={signIn}
             ></Button>
             <Button
               mode="outlined"
+              textColor="#000"
               children="Criar conta"
               onPress={signUp}
             ></Button>
