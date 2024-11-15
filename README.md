@@ -5,14 +5,18 @@
 Um app simples para uma lista de tarefas com as funcionalidades:
 
 - <b>Adicionar tarefas</b>
-  - Inserir nome da tarefa
-  - Salvar no Firebase
 - <b>Listar tarefas</b>
-  - Mostrar lista de tarefas cadastradas
-- <b>Marcar/Desmarcar tarefas</b>
-  - Salvar estado da tarefa no Firebase
+- <b>Alterar o status das tarefas</b>
 - <b>Deletar tarefas</b>
-  - Excluir tarefa do Firebase
-  - Remover tarefa da lista
 - <b>Filtrar tarefas</b>
   - Filtrar tarefas por status (pendente, em andamento, concluída ou todas)
+
+### :warning: Antes de rodar
+
+Para poder rodar o projeto é preciso substituir as variáveis de ambiente pelas credenciais do seu projeto firebase:
+
+![Variáveis de ambiente](<Captura de tela 2024-11-15 193138.png>)
+
+Para mais informações sobre como criar um projeto Firebase, acesse:
+
+[Firebase Docs](https://firebase.google.com/docs/?hl=en&authuser=0&_gl=1*za43ky*_ga*MTgyNTM4MjY4Ny4xNzMxMzc5OTI5*_ga_CW55HF8NVT*MTczMTcxMDExNy4yLjEuMTczMTcxMDE3NC4zLjAuMA..)
