@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./app/screens/Login";
-import List from "./app/screens/List";
+import Home from "./app/screens/Home";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { FIREBASE_AUTH } from "./FirebaseConfig";
@@ -13,7 +13,11 @@ const InsideStack = createNativeStackNavigator();
 function InsideLayout() {
   return (
     <InsideStack.Navigator>
-      <InsideStack.Screen name="Tarefas" component={List} />
+      <InsideStack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
     </InsideStack.Navigator>
   );
 }
