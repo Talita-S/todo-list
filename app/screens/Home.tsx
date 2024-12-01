@@ -1,5 +1,11 @@
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useContext, useState } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -12,6 +18,9 @@ import { NavigationProp } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
 import { DataContext } from "../utils/Context";
 import { createTodoTask } from "../firebase/create";
+import { fetchTodos } from "../firebase/read";
+import TodoItem from "../todo/TodoItem";
+import EmptyList from "../todo/EmptyList";
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -19,9 +28,13 @@ interface RouterProps {
 
 const Home = ({ navigation }: RouterProps) => {
   const user = getAuth(FIREBASE_APP).currentUser;
-  const { tasks, setTasks } = useContext(DataContext);
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [todo, setTodo] = useState("");
+
+  useLayoutEffect(() => {
+    getTodos();
+  }, []);
 
   async function addTodo() {
     if (todo.length < 3) {
@@ -45,12 +58,25 @@ const Home = ({ navigation }: RouterProps) => {
           id: user?.uid,
           docId: addedTask.id,
         };
-        setTasks(() => [todoItem, ...tasks]);
+        setTasks((tasks) => {
+          return {
+            ...tasks,
+            todoItem
+          }
+        });
         setTodo("");
       }
     } catch (error) {
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function getTodos() {
+    if (user) {
+      const result = await fetchTodos(user.uid);
+      const todos = result.docs.map((d) => ({ docId: d.id, ...d.data() }));
+      setTasks(todos);
     }
   }
 
@@ -115,6 +141,17 @@ const Home = ({ navigation }: RouterProps) => {
           style={styles.filterBtn}
         />
       </View>
+
+      <FlatList
+        data={tasks}
+        renderItem={({ item, index }) => (
+          <TodoItem data={item} key={item.docId} />
+        )}
+        ListEmptyComponent={EmptyList}
+        contentContainerStyle={styles.content}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
@@ -158,5 +195,9 @@ const styles = StyleSheet.create({
   },
   filterBtn: {
     borderRadius: 5,
+  },
+  content: {
+    marginTop: 15,
+    paddingBottom: 40,
   },
 });
