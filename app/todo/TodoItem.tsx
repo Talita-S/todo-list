@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
@@ -14,7 +15,8 @@ export interface TodoItemProps {
 }
 
 export default function TodoItem({ data }: { data: TodoItemProps }) {
-  const { todo, status } = data;
+  const { todo, status, docId, comment } = data;
+  const navigation = useNavigation<any>();
 
   const statusColors: { [key: string]: string } = {
     Pendente: "#DDB771",
@@ -26,7 +28,12 @@ export default function TodoItem({ data }: { data: TodoItemProps }) {
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity style={styles.row}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() =>
+          navigation.navigate("Editar", { todo, status, docId, comment })
+        }
+      >
         <View style={styles.icon}>
           {status === "Pendente" ? (
             <Icon source="clock-outline" size={30} />

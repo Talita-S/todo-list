@@ -5,6 +5,7 @@ import Home from "./app/screens/Home";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { FIREBASE_AUTH } from "./FirebaseConfig";
+import EditTodo from "./app/todo/EditTodo";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ function InsideLayout() {
         component={Home}
         options={{ headerShown: false }}
       />
+      <InsideStack.Screen name="Editar" component={EditTodo} />
     </InsideStack.Navigator>
   );
 }
