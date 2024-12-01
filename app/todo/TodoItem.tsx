@@ -1,7 +1,7 @@
 import { Timestamp } from "firebase/firestore";
-import { useContext, useState } from "react";
-import { DataContext } from "../utils/Context";
+import { useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { Divider, Icon } from "react-native-paper";
 
 export interface TodoItemProps {
   createdAt?: Timestamp;
@@ -14,30 +14,59 @@ export interface TodoItemProps {
 }
 
 export default function TodoItem({ data }: { data: TodoItemProps }) {
-  const { todo, comment, status, docId } = data;
-  const [currentStatus, setCurrentStatus] = useState(status);
+  const { todo, status } = data;
 
-  const { tasks, setTasks } = useContext(DataContext);
+  const statusColors: { [key: string]: string } = {
+    Pendente: "#DDB771",
+    "Em andamento": "#778DA9",
+    Concluída: "#6BBF59",
+  };
+
+  const statusColor = statusColors[status];
 
   return (
     <View style={styles.card}>
       <TouchableOpacity style={styles.row}>
-        <Text style={styles.todo}>{todo}</Text>
+        <View style={styles.icon}>
+          {status === "Pendente" ? (
+            <Icon source="clock-outline" size={30} />
+          ) : status === "Em andamento" ? (
+            <Icon source="dots-horizontal" size={30} />
+          ) : (
+            <Icon source="checkbox-outline" size={30} />
+          )}
+        </View>
+
+        <View style={styles.container}>
+          <Text style={styles.todo}>{todo}</Text>
+          <Text style={{ color: statusColor }}>{status}</Text>
+        </View>
       </TouchableOpacity>
+      <Divider style={{ marginTop: 10 }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
     padding: 12,
-    borderRadius: 4,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  todo: {},
+  todo: {
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  icon: {
+    padding: 5,
+    backgroundColor: "rgba(200, 200, 200, 0.5)",
+    borderRadius: 20,
+  },
+  container: {
+    display: "flex",
+    flexDirection: "column",
+  },
 });

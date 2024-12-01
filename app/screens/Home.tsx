@@ -5,21 +5,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Button,
-  Icon,
-  IconButton,
-  Text,
-} from "react-native-paper";
+import React, { useLayoutEffect, useState } from "react";
+import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 import { FIREBASE_APP } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
-import { DataContext } from "../utils/Context";
 import { createTodoTask } from "../firebase/create";
 import { fetchTodos } from "../firebase/read";
-import TodoItem from "../todo/TodoItem";
+import TodoItem, { TodoItemProps } from "../todo/TodoItem";
 import EmptyList from "../todo/EmptyList";
 
 interface RouterProps {
@@ -28,7 +21,7 @@ interface RouterProps {
 
 const Home = ({ navigation }: RouterProps) => {
   const user = getAuth(FIREBASE_APP).currentUser;
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<TodoItemProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [todo, setTodo] = useState("");
 
@@ -58,12 +51,7 @@ const Home = ({ navigation }: RouterProps) => {
           id: user?.uid,
           docId: addedTask.id,
         };
-        setTasks((tasks) => {
-          return {
-            ...tasks,
-            todoItem
-          }
-        });
+        setTasks((tasks) => [...tasks, todoItem]);
         setTodo("");
       }
     } catch (error) {
@@ -75,7 +63,10 @@ const Home = ({ navigation }: RouterProps) => {
   async function getTodos() {
     if (user) {
       const result = await fetchTodos(user.uid);
-      const todos = result.docs.map((d) => ({ docId: d.id, ...d.data() }));
+      const todos: TodoItemProps[] = result.docs.map((d) => ({
+        docId: d.id,
+        ...d.data(),
+      })) as TodoItemProps[];
       setTasks(todos);
     }
   }
@@ -144,9 +135,7 @@ const Home = ({ navigation }: RouterProps) => {
 
       <FlatList
         data={tasks}
-        renderItem={({ item, index }) => (
-          <TodoItem data={item} key={item.docId} />
-        )}
+        renderItem={({ item }) => <TodoItem data={item} key={item.docId} />}
         ListEmptyComponent={EmptyList}
         contentContainerStyle={styles.content}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
