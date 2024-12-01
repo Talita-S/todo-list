@@ -5,29 +5,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Button, Icon, Text } from "react-native-paper";
 import { FIREBASE_APP } from "../../FirebaseConfig";
-import { NavigationProp } from "@react-navigation/native";
-import { getAuth } from "firebase/auth";
 import { createTodoTask } from "../firebase/create";
 import { fetchTodos } from "../firebase/read";
 import TodoItem, { TodoItemProps } from "../todo/TodoItem";
 import EmptyList from "../todo/EmptyList";
+import { useFocusEffect } from "@react-navigation/native";
+import { getAuth } from "firebase/auth";
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
-
-const Home = ({ navigation }: RouterProps) => {
+const Home = () => {
   const user = getAuth(FIREBASE_APP).currentUser;
   const [tasks, setTasks] = useState<TodoItemProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [todo, setTodo] = useState("");
-
-  useLayoutEffect(() => {
-    getTodos();
-  }, []);
 
   async function addTodo() {
     if (todo.length < 3) {
@@ -74,14 +66,19 @@ const Home = ({ navigation }: RouterProps) => {
   async function getTodosByStatus(status: string) {
     if (user) {
       const result = await fetchTodos(user.uid, status);
-      const todos: TodoItemProps[] = result.docs
-      .map((d) => ({
+      const todos: TodoItemProps[] = result.docs.map((d) => ({
         docId: d.id,
         ...d.data(),
       })) as TodoItemProps[];
-    setTasks(todos);
+      setTasks(todos);
     }
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      getTodos();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
