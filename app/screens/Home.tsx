@@ -71,6 +71,18 @@ const Home = ({ navigation }: RouterProps) => {
     }
   }
 
+  async function getTodosByStatus(status: string) {
+    if (user) {
+      const result = await fetchTodos(user.uid, status);
+      const todos: TodoItemProps[] = result.docs
+      .map((d) => ({
+        docId: d.id,
+        ...d.data(),
+      })) as TodoItemProps[];
+    setTasks(todos);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.newTodoContainer}>
@@ -106,6 +118,7 @@ const Home = ({ navigation }: RouterProps) => {
           textColor="#000"
           compact
           style={styles.filterBtn}
+          onPress={getTodos}
         />
         <Button
           children="Pendente"
@@ -114,6 +127,7 @@ const Home = ({ navigation }: RouterProps) => {
           textColor="#000"
           compact
           style={styles.filterBtn}
+          onPress={() => getTodosByStatus("Pendente")}
         />
         <Button
           children="Em andamento"
@@ -122,6 +136,7 @@ const Home = ({ navigation }: RouterProps) => {
           textColor="#000"
           compact
           style={styles.filterBtn}
+          onPress={() => getTodosByStatus("Em andamento")}
         />
         <Button
           children="Concluída"
@@ -130,6 +145,7 @@ const Home = ({ navigation }: RouterProps) => {
           textColor="#000"
           compact
           style={styles.filterBtn}
+          onPress={() => getTodosByStatus("Concluída")}
         />
       </View>
 
