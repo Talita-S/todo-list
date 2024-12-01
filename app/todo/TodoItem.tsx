@@ -1,8 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
 import { Timestamp } from "firebase/firestore";
-import { useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Alert } from "react-native";
 import { Divider, Icon } from "react-native-paper";
+import { deleteTodoItem } from "../firebase/delete";
 
 export interface TodoItemProps {
   createdAt?: Timestamp;
@@ -14,7 +14,13 @@ export interface TodoItemProps {
   id: string;
 }
 
-export default function TodoItem({ data }: { data: TodoItemProps }) {
+export default function TodoItem({
+  data,
+  onDelete,
+}: {
+  data: TodoItemProps;
+  onDelete: () => void;
+}) {
   const { todo, status, docId, comment } = data;
   const navigation = useNavigation<any>();
 
@@ -26,6 +32,15 @@ export default function TodoItem({ data }: { data: TodoItemProps }) {
 
   const statusColor = statusColors[status];
 
+  const deleteTodo = async () => {
+    try {
+      await deleteTodoItem(docId);
+      onDelete();
+    } catch (error: any) {
+      Alert.alert("Algo deu errado", error.message);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <TouchableOpacity
@@ -33,6 +48,16 @@ export default function TodoItem({ data }: { data: TodoItemProps }) {
         onPress={() =>
           navigation.navigate("Editar", { todo, status, docId, comment })
         }
+        onLongPress={() => {
+          Alert.alert(
+            "Alerta",
+            "Você está tentando deletar esse item. Deseja continuar?",
+            [
+              { text: "Cancelar", onPress: () => null },
+              { text: "Continuar", style: "destructive", onPress: deleteTodo },
+            ]
+          );
+        }}
       >
         <View style={styles.icon}>
           {status === "Pendente" ? (

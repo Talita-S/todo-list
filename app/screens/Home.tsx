@@ -20,6 +20,7 @@ const Home = () => {
   const [tasks, setTasks] = useState<TodoItemProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [todo, setTodo] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   async function addTodo() {
     if (todo.length < 3) {
@@ -55,17 +56,6 @@ const Home = () => {
   async function getTodos() {
     if (user) {
       const result = await fetchTodos(user.uid);
-      const todos: TodoItemProps[] = result.docs.map((d) => ({
-        docId: d.id,
-        ...d.data(),
-      })) as TodoItemProps[];
-      setTasks(todos);
-    }
-  }
-
-  async function getTodosByStatus(status: string) {
-    if (user) {
-      const result = await fetchTodos(user.uid, status);
       const todos: TodoItemProps[] = result.docs.map((d) => ({
         docId: d.id,
         ...d.data(),
@@ -115,7 +105,7 @@ const Home = () => {
           textColor="#000"
           compact
           style={styles.filterBtn}
-          onPress={getTodos}
+          onPress={() => setSelectedStatus("")}
         />
         <Button
           children="Pendente"
@@ -124,7 +114,7 @@ const Home = () => {
           textColor="#000"
           compact
           style={styles.filterBtn}
-          onPress={() => getTodosByStatus("Pendente")}
+          onPress={() => setSelectedStatus("Pendente")}
         />
         <Button
           children="Em andamento"
@@ -133,7 +123,7 @@ const Home = () => {
           textColor="#000"
           compact
           style={styles.filterBtn}
-          onPress={() => getTodosByStatus("Em andamento")}
+          onPress={() => setSelectedStatus("Em andamento")}
         />
         <Button
           children="Concluída"
@@ -142,13 +132,19 @@ const Home = () => {
           textColor="#000"
           compact
           style={styles.filterBtn}
-          onPress={() => getTodosByStatus("Concluída")}
+          onPress={() => setSelectedStatus("Concluída")}
         />
       </View>
 
       <FlatList
-        data={tasks}
-        renderItem={({ item }) => <TodoItem data={item} key={item.docId} />}
+        data={
+          selectedStatus?.length > 0
+            ? tasks.filter((t) => t.status === selectedStatus)
+            : tasks
+        }
+        renderItem={({ item }) => (
+          <TodoItem data={item} key={item.docId} onDelete={() => getTodos()} />
+        )}
         ListEmptyComponent={EmptyList}
         contentContainerStyle={styles.content}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -163,6 +159,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    marginTop: 10,
   },
   newTodoContainer: {
     display: "flex",
